@@ -4,6 +4,7 @@ require('dotenv').config()
 const db = require('./config');
 const User = require('./models/User.model')
 const bodyParser = require('body-parser');
+const userController = require('./controllers/userController')
 var cors = require('cors')
 
 
@@ -22,84 +23,19 @@ app.use(cors())
 // });
 
 //manejar el envio del formulario 
-app.post("/users/add", async (req,res)=>{
+app.post("/users/add", userController.addUser);
 
-        try{
-            const {name,email} = req.body;
-            console.log("REQ.BODY", req.body);
-            if (!name || !email) throw new Error("Check your inputs")
-            const newUser = new User({ name, email });
-            await newUser.save();
-
-            res.sendStatus(200)
-            
-        
-
-        }catch (err){
-            console.error("Error insertando el documento:", err);
-            res.status(500).send("error agregando usuario");
-
-        }
-});
-
-
-//ontener el usuario agregado
-
-app.get("/users/:userId", async (req,res)=>{
-    try{
-        const userID=req.params.userId;
-
-        const user = await User.findById(userID);
-
-        if(!user){
-            return res.status(404).json({error:"Usuario no encontrado"});
-
-        }
-        res.json(user);
-    }catch (err){
-        console.error("Error mostrando usuario: ", err);
-        res.status(500).json({error: "Error mostrando usuario0"});
-    }
-})
 
 
 // obtener todos los usurios 
 
 
-app.get("/users", async (req,res)=>{
-    try{
-       
-        const users = await User.find();
-
-        res.status(200).json(users);
-    }catch (err){
-        console.error("Error mostrando usuario: ", err);
-        res.status(500).json({error: "Error mostrando usuario0"});
-    }
-})
+app.get("/users", userController.getUsers)
 
 
 //delete user
 
-app.delete("/users/:userId", async (req,res)=>{
-    try{
-        const userId=req.params.userId;
-        console.log({userId});
-
-        const deleteUser = await User.findByIdAndRemove(userId);
-
-        if(!deleteUser){
-            return res.status(404).json({error: "Usuario no encontrado"});
-
-        }
-
-        res.json({mensaje:"Usuario eliminado correctamente"+ deleteUser});
-
-    }catch(err){
-        console.error("Error eliminando usuario"+ err);
-        res.status(500).json({error: "Error eliminando usuario "})
-    }
-});
+app.delete("/users/:userId", userController.deleteUser);
 
 // Star el serve
 
