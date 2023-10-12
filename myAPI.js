@@ -1,5 +1,6 @@
 //conectando mongo, express y body
 const express = require("express");
+require('dotenv').config()
 const db = require('./config');
 const User = require('./models/User.model')
 const bodyParser = require('body-parser');
